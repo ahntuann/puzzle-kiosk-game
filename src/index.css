@@ -1,0 +1,34 @@
+@import url("https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;600;700&display=swap");
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  /* background: url("/bg_main.jpg") no-repeat center center/cover; */
+  font-family: "Bai Jamjuree", sans-serif;
+  touch-action: none;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+.btn-upload {
+  border: 2px solid #fff;
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.15);
+  padding: 18px 50px;
+  border-radius: 30px;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-upload:hover {
+  background-color: #fff;
+  color: #000;
+}
