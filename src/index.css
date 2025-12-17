@@ -11,6 +11,16 @@ body {
   touch-action: none;
 }
 
+/* index.css */
+body,
+#root {
+  touch-action: none; /* Bắt buộc */
+  user-select: none; /* Không cho bôi đen text */
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  overscroll-behavior: none; /* Chặn kéo nảy trang (rubber band) */
+}
+
 #root {
   width: 100%;
   height: 100%;

@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { Stage, Layer, Rect, Text, Group, Circle } from "react-konva";
+import {
+  Stage,
+  Layer,
+  Rect,
+  Group,
+  Circle,
+  Image as KonvaImage,
+} from "react-konva"; // Thêm Image import
 import useImage from "use-image";
 import useSound from "use-sound";
 import Konva from "konva";
@@ -16,7 +23,7 @@ import {
 } from "./utils";
 import PuzzleBoard from "./components/PuzzleBoard";
 import EmmieFrame from "./components/EmmieFrame";
-import ModernStars from "./components/ModernStars";
+// import ModernStars from "./components/ModernStars"; // Tắt sao bay để tối ưu
 
 const TRAY_CONFIG = {
   y: 1400,
@@ -43,7 +50,7 @@ export default function JigsawGame({ userImage, onReset }) {
 
   const [imageObj] = useImage(userImage);
 
-  // --- ÂM THANH (SỬA LỖI TẠI ĐÂY) ---
+  // --- ÂM THANH ---
   const [playBgm, { stop: stopBgm }] = useSound("/sounds/bgm.mp3", {
     volume: 0.7,
     loop: true,
@@ -51,8 +58,6 @@ export default function JigsawGame({ userImage, onReset }) {
   });
   const [playPop] = useSound("/sounds/pop.mp3", { volume: 1.0 });
   const [playSnap] = useSound("/sounds/snap.mp3", { volume: 1.0 });
-
-  // Lấy thêm hàm stopWin để tắt nhạc khi reset
   const [playWin, { stop: stopWin }] = useSound("/sounds/win.mp3", {
     volume: 1.0,
   });
@@ -61,7 +66,7 @@ export default function JigsawGame({ userImage, onReset }) {
     playBgm();
     return () => {
       stopBgm();
-      stopWin(); // Đảm bảo tắt nhạc win khi unmount
+      stopWin();
     };
   }, [playBgm, stopBgm, stopWin]);
 
@@ -150,6 +155,9 @@ export default function JigsawGame({ userImage, onReset }) {
     const piece = pieces.find((p) => p.id === id);
     if (!piece) return;
 
+    // Logic tính toán khoảng cách vẫn giữ nguyên
+    // Lưu ý: Do e.target.x() bị ảnh hưởng bởi padding trong PuzzlePiece,
+    // nhưng logic này vẫn đúng nếu bạn không thay đổi offset trong PuzzlePiece
     const x = e.target.x() + layout.padding;
     const y = e.target.y() + layout.padding;
     const dist = Math.hypot(x - piece.correctX, y - piece.correctY);
@@ -194,6 +202,7 @@ export default function JigsawGame({ userImage, onReset }) {
         easing: Konva.Easings.StrongEaseOut,
       });
 
+      // Reset về vị trí spawn nếu thả sai
       setPieces((old) =>
         old.map((p) =>
           p.id === id
@@ -213,8 +222,11 @@ export default function JigsawGame({ userImage, onReset }) {
 
   return (
     <div className="game-scene">
+      {/* CSS Effects: Đã tắt bớt trong effects.css */}
       <div className="cyber-grid"></div>
-      <div className="floating-particles"></div>
+
+      {/* TẮT PARTICLE NẾU LAG */}
+      {/* <div className="floating-particles"></div> */}
 
       <img src="/images/logo1.png" alt="Brand Logo" className="game-logo" />
 
@@ -223,41 +235,52 @@ export default function JigsawGame({ userImage, onReset }) {
         height={window.innerHeight}
         scaleX={window.innerWidth / KIOSK_WIDTH}
         scaleY={window.innerHeight / KIOSK_HEIGHT}
+        pixelRatio={1} // QUAN TRỌNG: Giữ tỷ lệ 1:1 cho nhẹ
+        listening={true}
       >
-        <Layer>
-          {/* --- FIX LỖI XUYÊN THẤU TẠI ĐÂY --- */}
-
-          {/* 1. NỀN ĐẶC (BLOCKER): Che lưới sọc bên dưới */}
+        {/* --- LAYER 1: TĨNH (STATIC LAYER) ---
+            Chứa tất cả những thứ KHÔNG BAO GIỜ DI CHUYỂN.
+            listening={false} giúp Konva bỏ qua kiểm tra va chạm chuột ở đây -> Siêu nhẹ.
+        */}
+        <Layer listening={false}>
+          {/* 1. NỀN ĐẶC (BLOCKER) */}
           <Rect
             x={layout.boardX - 20}
             y={layout.boardY - 20}
             width={layout.boardW + 40}
             height={layout.boardH + 40}
-            fill="#050a1f" // Màu xanh đen đậm nhất của theme, không dùng rgba trong suốt
+            fill="#050a1f"
             cornerRadius={20}
-            // Thêm hiệu ứng tỏa sáng (Glow) để tách biệt bảng ra khỏi nền
             shadowColor="#00d4ff"
-            shadowBlur={20}
+            shadowBlur={0} // Tắt blur đi cho nhẹ, hoặc để nhỏ
             shadowOpacity={0.3}
-            stroke="#00d4ff" // Viền mỏng xanh neon
+            stroke="#00d4ff"
             strokeWidth={1}
           />
 
-          {/* 2. KHAY CHỨA (Giữ nguyên, nhưng chỉnh lại fill cho đồng bộ) */}
+          {/* 2. ẢNH HINT MỜ (Được tách ra từ PuzzleBoard để nằm ở layer tĩnh) */}
+          <KonvaImage
+            image={imageObj}
+            x={layout.boardX}
+            y={layout.boardY}
+            width={layout.boardW}
+            height={layout.boardH}
+            opacity={0.15} // Mờ đi để gợi ý
+          />
+
+          {/* 3. KHAY CHỨA */}
           <Group>
             <Rect
               x={40}
               y={TRAY_CONFIG.y - 40}
               width={KIOSK_WIDTH - 80}
               height={500}
-              fill="#08102b" // Nền đặc màu tối
+              fill="#08102b"
               cornerRadius={40}
               stroke="rgba(0, 212, 255, 0.3)"
               strokeWidth={2}
-              shadowColor="black"
-              shadowBlur={20}
             />
-
+            {/* Vẽ các slot nét đứt */}
             {Array.from({ length: 6 }).map((_, i) => {
               const r = Math.floor(i / TRAY_CONFIG.cols);
               const c = i % TRAY_CONFIG.cols;
@@ -279,6 +302,7 @@ export default function JigsawGame({ userImage, onReset }) {
                     stroke="rgba(255,255,255,0.1)"
                     dash={[5, 5]}
                   />
+                  {/* Dấu cộng */}
                   <Rect
                     x={-10}
                     y={-1}
@@ -296,25 +320,16 @@ export default function JigsawGame({ userImage, onReset }) {
                 </Group>
               );
             })}
-
-            {/* <Text
-              text="KHO MẢNH GHÉP"
-              x={0}
-              y={TRAY_CONFIG.y - 80}
-              width={KIOSK_WIDTH}
-              align="center"
-              fill="#00d4ff"
-              fontFamily="'Exo 2', sans-serif"
-              fontSize={28}
-              fontStyle="bold"
-            /> */}
           </Group>
 
+          {/* 4. KHUNG TRANG TRÍ */}
           <EmmieFrame width={KIOSK_WIDTH} height={KIOSK_HEIGHT} />
-          <ModernStars />
+        </Layer>
 
-          {/* 3. ẢNH HINT & MẢNH GHÉP: Nằm đè lên lớp nền đặc ở trên */}
-          {/* PuzzleBoard đã có sẵn logic opacity=0.15 cho ảnh hint, nên nó sẽ mờ trên nền #050a1f */}
+        {/* --- LAYER 2: ĐỘNG (DYNAMIC LAYER) ---
+            Chỉ chứa các mảnh ghép. Khi kéo thả, chỉ layer này được vẽ lại.
+        */}
+        <Layer>
           <PuzzleBoard
             img={userImage}
             boardX={layout.boardX}
@@ -331,11 +346,11 @@ export default function JigsawGame({ userImage, onReset }) {
         </Layer>
       </Stage>
 
-      {/* --- NÚT BACK (Thêm stopWin) --- */}
+      {/* --- NÚT BACK --- */}
       <button
         onClick={() => {
           stopBgm();
-          stopWin(); // Tắt nhạc Win
+          stopWin();
           onReset();
         }}
         className="btn-upload"
@@ -362,11 +377,10 @@ export default function JigsawGame({ userImage, onReset }) {
           <h1 style={{ fontSize: "6rem", textShadow: "0 0 20px #00d4ff" }}>
             HOÀN THÀNH!
           </h1>
-          {/* --- NÚT CHƠI LẠI (Thêm stopWin) --- */}
           <button
             onClick={() => {
               stopBgm();
-              stopWin(); // Tắt nhạc Win
+              stopWin();
               onReset();
             }}
             className="btn-upload"

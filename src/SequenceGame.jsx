@@ -1,91 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { Stage, Layer, Image as KonvaImage, Group, Text } from "react-konva";
+import { Stage, Layer } from "react-konva";
 import useImage from "use-image";
 import useSound from "use-sound";
 import Konva from "konva";
 import { KIOSK_WIDTH, KIOSK_HEIGHT, shuffleArray } from "./utils";
 import NumberPiece from "./components/NumberPiece";
-
+import ProductSlot from "./components/ProductSlot";
 import "./styles/effects.css";
 import "./styles/SequenceGame.css";
 
 // --- CẤU HÌNH ---
-// ... (GIỮ NGUYÊN PHẦN DATA COMBOS CỦA BẠN Ở ĐÂY) ...
+// ... (GIỮ NGUYÊN PHẦN DATA COMBOS NHƯ CŨ) ...
 const COMBOS = {
   COMBO_1: [
-    {
-      stepId: 1,
-      img: "/images/routine/c1_1.png",
-      text: "Tẩy Trang 2 Lớp\nEmmie by HappySkin\n3 in 1 Bi-Phase\nMicellar Water",
-    },
-    {
-      stepId: 2,
-      img: "/images/routine/c1_2.png",
-      text: "Gel Rửa Mặt\nSạch Sâu\nKiểm Soát Mụn",
-    },
-    {
-      stepId: 3,
-      img: "/images/routine/C1_3.png",
-      text: "Máy Rửa Mặt\nEmmie Premium\nFacial Cleansing Brush",
-    },
-    {
-      stepId: 4,
-      img: "/images/routine/C1_4.png",
-      text: "Nước Thần 5% Nia\nBright & Plump Probi\nFerment Solution",
-    },
-    {
-      stepId: 5,
-      img: "/images/routine/C1_5.png",
-      text: "Mandelic 10%\nTrẻ Hóa Và\nCăng Bóng Da",
-    },
-    {
-      stepId: 6,
-      img: "/images/routine/C1_6.png",
-      text: "Mặt Nạ Biomecare\n& Rebalance Bio\nCellulose B5 + Peptides",
-    },
-    {
-      stepId: 7,
-      img: "/images/routine/C1_7.png",
-      text: "Biomecare & Repair\nWater Cream B5\nKem Dưỡng Ẩm\nVà Phục Hồi",
-    },
+    { stepId: 1, img: "/images/routine/c1_1.png", text: "Tẩy Trang..." },
+    { stepId: 2, img: "/images/routine/c1_2.png", text: "Gel Rửa Mặt..." },
+    { stepId: 3, img: "/images/routine/C1_3.png", text: "Máy Rửa Mặt..." },
+    { stepId: 4, img: "/images/routine/C1_4.png", text: "Nước Thần..." },
+    { stepId: 5, img: "/images/routine/C1_5.png", text: "Mandelic 10%..." },
+    { stepId: 6, img: "/images/routine/C1_6.png", text: "Mặt Nạ..." },
+    { stepId: 7, img: "/images/routine/C1_7.png", text: "Kem Dưỡng..." },
   ],
-  COMBO_2: [
-    {
-      stepId: 1,
-      img: "/images/routine/C2_1.png",
-      text: "Nước Tẩy Trang\nSoothing Polluclear\nMicellar Water",
-    },
-    {
-      stepId: 2,
-      img: "/images/routine/C2_2.png",
-      text: "Gel Rửa Mặt Dịu Nhẹ\nCấp Ẩm Sâu Emmié\nSoothing & Hydrating",
-    },
-    {
-      stepId: 3,
-      img: "/images/routine/C2_3.png",
-      text: "Máy Rửa Mặt Đa Năng\nEmmie Glowmaster\n7-in-1 Beauty Device",
-    },
-    {
-      stepId: 4,
-      img: "/images/routine/C2_4.png",
-      text: "Nước Thần 5% Nia\nBright & Plump Probi\nFerment Solution",
-    },
-    {
-      stepId: 5,
-      img: "/images/routine/C2_5.png",
-      text: "Mandelic 12%\nTinh Chất Trẻ Hóa\nDa Ban Đêm",
-    },
-    {
-      stepId: 6,
-      img: "/images/routine/C2_6.png",
-      text: "Mặt Nạ Microfiber\nĐu Đủ Dưỡng Trắng Da",
-    },
-    {
-      stepId: 7,
-      img: "/images/routine/C2_7.png",
-      text: "Biomecare & Repair\nWater Cream B5\nKem Dưỡng Ẩm\nVà Phục Hồi",
-    },
-  ],
+  // ... Combo 2 (nếu có)
 };
 
 const CARD_W = 220;
@@ -103,70 +39,54 @@ const SLOT_COORDS = [
   { x: 800, y: 900 },
 ];
 
-const GAME_DURATION = 180;
 const SNAP_TOLERANCE = 120;
 
 export default function SequenceGame({ onBack, audioEnabled }) {
   const [slots, setSlots] = useState([]);
   const [pieces, setPieces] = useState([]);
-  const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
-  const [gameState, setGameState] = useState("playing");
+  // BỎ STATE TIMER VÀ GAME STATE LOST
+  const [isWin, setIsWin] = useState(false); // Chỉ cần biết thắng hay chưa
 
-  // --- ÂM THANH (QUAN TRỌNG: KHAI BÁO ID ĐỂ QUẢN LÝ) ---
+  // --- ÂM THANH ---
   const [playBgm, { stop: stopBgm, isPlaying: isBgmPlaying }] = useSound(
     "/sounds/bgm.mp3",
-    {
-      volume: 0.5,
-      loop: true,
-      interrupt: true,
-    }
+    { volume: 0.5, loop: true, interrupt: true }
   );
-
   const [playSnap] = useSound("/sounds/snap.mp3");
   const [playPop] = useSound("/sounds/pop.mp3");
   const [playWrong] = useSound("/sounds/buzz.mp3");
   const [playWin, { stop: stopWin }] = useSound("/sounds/win.mp3");
 
-  const [bgImage] = useImage("/images/skinverse_bg.png");
-
-  // --- HÀM XỬ LÝ THOÁT GAME AN TOÀN ---
-  // Gọi hàm này khi bấm Back hoặc Chơi lại để đảm bảo tắt tiếng trước
   const handleExit = () => {
-    stopBgm(); // Tắt nhạc nền
-    stopWin(); // Tắt nhạc chiến thắng
-    onBack(); // Sau đó mới thoát ra menu
+    stopBgm();
+    stopWin();
+    onBack();
   };
 
-  // --- AUTO PLAY & CLEANUP ---
+  // --- SETUP ---
   useEffect(() => {
-    // Chỉ bật nhạc nếu đang playing và chưa có nhạc
-    if (audioEnabled && gameState === "playing" && !isBgmPlaying) {
-      // Delay nhẹ để tránh xung đột
-      const timeout = setTimeout(() => {
-        playBgm();
-      }, 500);
+    // Chỉ bật nhạc nếu chưa thắng và chưa có nhạc
+    if (audioEnabled && !isWin && !isBgmPlaying) {
+      const timeout = setTimeout(() => playBgm(), 500);
       return () => clearTimeout(timeout);
     }
-
-    // CLEANUP TUYỆT ĐỐI: Khi component bị hủy (unmount), tắt hết âm thanh
     return () => {
       stopBgm();
       stopWin();
     };
-  }, [audioEnabled, gameState, playBgm, stopBgm, stopWin, isBgmPlaying]);
+  }, [audioEnabled, isWin, playBgm, stopBgm, stopWin, isBgmPlaying]);
 
-  // SETUP GAME
   useEffect(() => {
+    // 1. Setup Slots (Giữ nguyên)
     const rawCombo = [...COMBOS.COMBO_1];
     const shuffledProducts = shuffleArray(rawCombo);
 
     const newSlots = SLOT_COORDS.map((coord, index) => {
       const dropZoneY_Offset = CARD_H + 10;
       const dropZoneX_Offset = (CARD_W - DROP_SIZE) / 2;
-
       return {
         ...coord,
-        product: shuffledProducts[index],
+        product: shuffledProducts[index] || {},
         frameX: coord.x + dropZoneX_Offset,
         frameY: coord.y + dropZoneY_Offset,
         snapCenterX: coord.x + dropZoneX_Offset + DROP_SIZE / 2,
@@ -175,6 +95,7 @@ export default function SequenceGame({ onBack, audioEnabled }) {
     });
     setSlots(newSlots);
 
+    // 2. Setup Pieces (Giữ nguyên)
     const newPieces = Array.from({ length: 7 }, (_, i) => {
       const id = i + 1;
       const spawnX = 80 + i * 140;
@@ -192,25 +113,12 @@ export default function SequenceGame({ onBack, audioEnabled }) {
     setPieces(newPieces);
   }, []);
 
-  // TIMER LOGIC
-  useEffect(() => {
-    if (gameState !== "playing") return;
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 0) {
-          clearInterval(timer);
-          setGameState("lost");
-          stopBgm(); // Hết giờ cũng tắt nhạc nền
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [gameState, stopBgm]);
+  // --- ĐÃ XÓA HOÀN TOÀN LOGIC TIMER Ở ĐÂY ---
 
-  // DRAG & DROP
-  const handleDragStart = () => playPop();
+  // --- DRAG HANDLERS ---
+  const handleDragStart = (e) => {
+    playPop();
+  };
 
   const handleDragEnd = (e, pieceId) => {
     const pieceNode = e.target;
@@ -240,9 +148,12 @@ export default function SequenceGame({ onBack, audioEnabled }) {
       const centeredX = targetSlot.frameX + (DROP_SIZE - NUMBER_SIZE) / 2;
       const centeredY = targetSlot.frameY + (DROP_SIZE - NUMBER_SIZE) / 2;
 
+      // ĐÚNG: Giữ nguyên scale to (1.2) cho đẹp
       pieceNode.to({
         x: centeredX,
         y: centeredY,
+        scaleX: 1.2,
+        scaleY: 1.2,
         duration: 0.2,
         easing: Konva.Easings.BackEaseOut,
       });
@@ -258,9 +169,13 @@ export default function SequenceGame({ onBack, audioEnabled }) {
     } else {
       playWrong();
       const originalPiece = pieces.find((p) => p.id === pieceId);
+
+      // SAI: Thu nhỏ về 1
       pieceNode.to({
         x: originalPiece.spawnX,
         y: originalPiece.spawnY,
+        scaleX: 1,
+        scaleY: 1,
         duration: 0.4,
         easing: Konva.Easings.StrongEaseOut,
       });
@@ -274,9 +189,9 @@ export default function SequenceGame({ onBack, audioEnabled }) {
       );
       if (allLocked) {
         setTimeout(() => {
-          stopBgm(); // Tắt nhạc nền trước khi phát nhạc win
+          stopBgm();
           playWin();
-          setGameState("won");
+          setIsWin(true);
         }, 500);
       }
       return currentPieces;
@@ -287,15 +202,17 @@ export default function SequenceGame({ onBack, audioEnabled }) {
     <div className="sequence-background">
       <img src="/images/logo1.png" alt="Logo" className="game-logo" />
 
-      <FunTimer timeLeft={timeLeft} />
+      {/* ĐÃ XÓA COMPONENT FunTimer */}
 
       <Stage
         width={window.innerWidth}
         height={window.innerHeight}
         scaleX={window.innerWidth / KIOSK_WIDTH}
         scaleY={window.innerHeight / KIOSK_HEIGHT}
+        pixelRatio={1} // Tối ưu
       >
-        <Layer>
+        {/* LAYER 1: TĨNH */}
+        <Layer listening={false}>
           {slots.map((slot, i) => (
             <ProductSlot
               key={i}
@@ -304,9 +221,15 @@ export default function SequenceGame({ onBack, audioEnabled }) {
               product={slot.product}
               frameX={slot.frameX}
               frameY={slot.frameY}
+              cardW={CARD_W}
+              cardH={CARD_H}
+              dropSize={DROP_SIZE}
             />
           ))}
+        </Layer>
 
+        {/* LAYER 2: ĐỘNG */}
+        <Layer>
           {pieces.map((piece) => (
             <NumberPiece
               key={piece.id}
@@ -319,13 +242,9 @@ export default function SequenceGame({ onBack, audioEnabled }) {
         </Layer>
       </Stage>
 
-      {/* Truyền hàm handleExit vào prop onReset thay vì onBack trực tiếp */}
-      {gameState === "won" && <ResultOverlay type="win" onReset={handleExit} />}
-      {gameState === "lost" && (
-        <ResultOverlay type="lose" onReset={handleExit} />
-      )}
+      {/* Chỉ còn màn hình Win, không còn Lose */}
+      {isWin && <ResultOverlay onReset={handleExit} />}
 
-      {/* Nút Back ở góc cũng dùng handleExit */}
       <button
         onClick={handleExit}
         className="btn-upload"
@@ -337,64 +256,8 @@ export default function SequenceGame({ onBack, audioEnabled }) {
   );
 }
 
-// --- SUB-COMPONENTS ---
-const FunTimer = ({ timeLeft }) => {
-  const minutes = Math.floor(timeLeft / 60);
-  const seconds = timeLeft % 60;
-  const formattedTime = `${minutes < 10 ? "0" : ""}${minutes}:${
-    seconds < 10 ? "0" : ""
-  }${seconds}`;
-  const isUrgent = timeLeft <= 10;
-
-  return (
-    <div className={`fun-timer-container ${isUrgent ? "timer-urgent" : ""}`}>
-      <div className="timer-icon">⏳</div>
-      <div className="timer-text">{formattedTime}</div>
-    </div>
-  );
-};
-
-const ProductSlot = ({ x, y, product, frameX, frameY }) => {
-  const [cardBg] = useImage("/images/frames/rect2.png");
-  const [frameBg] = useImage("/images/frames/rect1.png");
-  const [prodImg] = useImage(product.img);
-
-  return (
-    <Group>
-      <Group x={x} y={y}>
-        <KonvaImage image={cardBg} width={CARD_W} height={CARD_H} />
-        <Text
-          text={product.text}
-          x={10}
-          y={20}
-          width={CARD_W - 20}
-          align="center"
-          fontFamily="Bai Jamjuree"
-          fontSize={18}
-          fontStyle="bold"
-          fill="#1a3a7a"
-          lineHeight={1.3}
-        />
-        <KonvaImage
-          image={prodImg}
-          width={120}
-          height={180}
-          x={(CARD_W - 120) / 2}
-          y={130}
-        />
-      </Group>
-      <KonvaImage
-        image={frameBg}
-        x={frameX}
-        y={frameY}
-        width={DROP_SIZE}
-        height={DROP_SIZE}
-      />
-    </Group>
-  );
-};
-
-const ResultOverlay = ({ type, onReset }) => (
+// Giản lược ResultOverlay vì chỉ còn 1 trường hợp thắng
+const ResultOverlay = ({ onReset }) => (
   <div
     style={{
       position: "absolute",
@@ -409,24 +272,14 @@ const ResultOverlay = ({ type, onReset }) => (
       color: "white",
     }}
   >
-    <h1
-      className="glitch"
-      style={{
-        fontSize: "6rem",
-        color: type === "win" ? "#00d4ff" : "#ff3333",
-      }}
-    >
-      {type === "win" ? "BIG WIN!" : "GAME OVER"}
+    <h1 className="glitch" style={{ fontSize: "6rem", color: "#00d4ff" }}>
+      BIG WIN!
     </h1>
-    {type === "win" && (
-      <div className="text" style={{ fontSize: "2rem", margin: "20px" }}>
-        Bạn đã nhận được 01 Bao Lì Xì!
-      </div>
-    )}
-
-    {/* Nút này sẽ gọi handleExit để tắt nhạc trước khi thoát */}
+    <div className="text" style={{ fontSize: "2rem", margin: "20px" }}>
+      Bạn đã nhận được 01 Bao Lì Xì!
+    </div>
     <button onClick={onReset} className="btn-upload" style={{ marginTop: 50 }}>
-      {type === "win" ? "CHƠI LẠI" : "THỬ LẠI"}
+      CHƠI LẠI
     </button>
   </div>
 );

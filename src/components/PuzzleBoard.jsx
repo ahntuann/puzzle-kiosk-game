@@ -20,14 +20,14 @@ export default function PuzzleBoard({
   return (
     <Group>
       {/* Ảnh nền mờ để hint */}
-      <KonvaImage
+      {/* <KonvaImage
         image={image}
         x={boardX}
         y={boardY}
         width={boardWidth}
         height={boardHeight}
         opacity={0.1} // Tăng nhẹ opacity cho dễ nhìn form
-      />
+      /> */}
 
       {pieces.map((p) => (
         <PuzzlePiece
