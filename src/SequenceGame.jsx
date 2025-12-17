@@ -8,20 +8,84 @@ import NumberPiece from "./components/NumberPiece";
 import ProductSlot from "./components/ProductSlot";
 import "./styles/effects.css";
 import "./styles/SequenceGame.css";
+import WinScreen from "./components/WinScreen";
 
 // --- CẤU HÌNH ---
-// ... (GIỮ NGUYÊN PHẦN DATA COMBOS NHƯ CŨ) ...
 const COMBOS = {
   COMBO_1: [
-    { stepId: 1, img: "/images/routine/c1_1.png", text: "Tẩy Trang..." },
-    { stepId: 2, img: "/images/routine/c1_2.png", text: "Gel Rửa Mặt..." },
-    { stepId: 3, img: "/images/routine/C1_3.png", text: "Máy Rửa Mặt..." },
-    { stepId: 4, img: "/images/routine/C1_4.png", text: "Nước Thần..." },
-    { stepId: 5, img: "/images/routine/C1_5.png", text: "Mandelic 10%..." },
-    { stepId: 6, img: "/images/routine/C1_6.png", text: "Mặt Nạ..." },
-    { stepId: 7, img: "/images/routine/C1_7.png", text: "Kem Dưỡng..." },
+    {
+      stepId: 1,
+      img: "/images/routine/c1_1.png",
+      text: "Tẩy Trang 2 Lớp\nEmmie by HappySkin\n3 in 1 Bi-Phase\nMicellar Water",
+    },
+    {
+      stepId: 2,
+      img: "/images/routine/c1_2.png",
+      text: "Gel Rửa Mặt\nSạch Sâu\nKiểm Soát Mụn",
+    },
+    {
+      stepId: 3,
+      img: "/images/routine/C1_3.png",
+      text: "Máy Rửa Mặt\nEmmie Premium\nFacial Cleansing Brush",
+    },
+    {
+      stepId: 4,
+      img: "/images/routine/C1_4.png",
+      text: "Nước Thần 5% Nia\nBright & Plump Probi\nFerment Solution",
+    },
+    {
+      stepId: 5,
+      img: "/images/routine/C1_5.png",
+      text: "Mandelic 10%\nTrẻ Hóa Và\nCăng Bóng Da",
+    },
+    {
+      stepId: 6,
+      img: "/images/routine/C1_6.png",
+      text: "Mặt Nạ Biomecare\n& Rebalance Bio\nCellulose B5 + Peptides",
+    },
+    {
+      stepId: 7,
+      img: "/images/routine/C1_7.png",
+      text: "Biomecare & Repair\nWater Cream B5\nKem Dưỡng Ẩm\nVà Phục Hồi",
+    },
   ],
-  // ... Combo 2 (nếu có)
+  COMBO_2: [
+    {
+      stepId: 1,
+      img: "/images/routine/C2_1.png",
+      text: "Nước Tẩy Trang\nSoothing Polluclear\nMicellar Water",
+    },
+    {
+      stepId: 2,
+      img: "/images/routine/C2_2.png",
+      text: "Gel Rửa Mặt Dịu Nhẹ\nCấp Ẩm Sâu Emmié\nSoothing & Hydrating",
+    },
+    {
+      stepId: 3,
+      img: "/images/routine/C2_3.png",
+      text: "Máy Rửa Mặt Đa Năng\nEmmie Glowmaster\n7-in-1 Beauty Device",
+    },
+    {
+      stepId: 4,
+      img: "/images/routine/C2_4.png",
+      text: "Nước Thần 5% Nia\nBright & Plump Probi\nFerment Solution",
+    },
+    {
+      stepId: 5,
+      img: "/images/routine/C2_5.png",
+      text: "Mandelic 12%\nTinh Chất Trẻ Hóa\nDa Ban Đêm",
+    },
+    {
+      stepId: 6,
+      img: "/images/routine/C2_6.png",
+      text: "Mặt Nạ Microfiber\nĐu Đủ Dưỡng Trắng Da",
+    },
+    {
+      stepId: 7,
+      img: "/images/routine/C2_7.png",
+      text: "Biomecare & Repair\nWater Cream B5\nKem Dưỡng Ẩm\nVà Phục Hồi",
+    },
+  ],
 };
 
 const CARD_W = 220;
@@ -113,8 +177,6 @@ export default function SequenceGame({ onBack, audioEnabled }) {
     setPieces(newPieces);
   }, []);
 
-  // --- ĐÃ XÓA HOÀN TOÀN LOGIC TIMER Ở ĐÂY ---
-
   // --- DRAG HANDLERS ---
   const handleDragStart = (e) => {
     playPop();
@@ -148,7 +210,6 @@ export default function SequenceGame({ onBack, audioEnabled }) {
       const centeredX = targetSlot.frameX + (DROP_SIZE - NUMBER_SIZE) / 2;
       const centeredY = targetSlot.frameY + (DROP_SIZE - NUMBER_SIZE) / 2;
 
-      // ĐÚNG: Giữ nguyên scale to (1.2) cho đẹp
       pieceNode.to({
         x: centeredX,
         y: centeredY,
@@ -170,7 +231,6 @@ export default function SequenceGame({ onBack, audioEnabled }) {
       playWrong();
       const originalPiece = pieces.find((p) => p.id === pieceId);
 
-      // SAI: Thu nhỏ về 1
       pieceNode.to({
         x: originalPiece.spawnX,
         y: originalPiece.spawnY,
@@ -201,8 +261,6 @@ export default function SequenceGame({ onBack, audioEnabled }) {
   return (
     <div className="sequence-background">
       <img src="/images/logo1.png" alt="Logo" className="game-logo" />
-
-      {/* ĐÃ XÓA COMPONENT FunTimer */}
 
       <Stage
         width={window.innerWidth}
@@ -243,7 +301,7 @@ export default function SequenceGame({ onBack, audioEnabled }) {
       </Stage>
 
       {/* Chỉ còn màn hình Win, không còn Lose */}
-      {isWin && <ResultOverlay onReset={handleExit} />}
+      {isWin && <WinScreen onReset={handleExit} />}
 
       <button
         onClick={handleExit}
@@ -255,31 +313,3 @@ export default function SequenceGame({ onBack, audioEnabled }) {
     </div>
   );
 }
-
-// Giản lược ResultOverlay vì chỉ còn 1 trường hợp thắng
-const ResultOverlay = ({ onReset }) => (
-  <div
-    style={{
-      position: "absolute",
-      inset: 0,
-      background: "rgba(0,10,30,0.95)",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 50,
-      fontFamily: "Bai Jamjuree",
-      color: "white",
-    }}
-  >
-    <h1 className="glitch" style={{ fontSize: "6rem", color: "#00d4ff" }}>
-      BIG WIN!
-    </h1>
-    <div className="text" style={{ fontSize: "2rem", margin: "20px" }}>
-      Bạn đã nhận được 01 Bao Lì Xì!
-    </div>
-    <button onClick={onReset} className="btn-upload" style={{ marginTop: 50 }}>
-      CHƠI LẠI
-    </button>
-  </div>
-);

@@ -69,6 +69,7 @@
     /* Xanh tối */ #12255b 70%,
     /* Xanh dương đậm */ #1a3a7a 100% /* Xanh dương sáng hơn ở góc */
   );
+  background: url("/public/bg_main.jpg");
   position: relative;
   overflow: hidden;
   font-family: "Bai Jamjuree", sans-serif;
@@ -82,7 +83,7 @@
   padding: 40px;
   /* CŨ: rgba(16, 18, 37, 0.7) */
   /* MỚI: Nền hộp nội dung cũng xanh hơn một chút */
-  background: rgba(10, 20, 40, 0.95);
+  background: rgba(10, 20, 40, 0.6);
   /* backdrop-filter: blur(10px); */
   border-radius: 30px;
   border: 1px solid rgba(0, 212, 255, 0.2);
@@ -100,21 +101,22 @@
   /* CŨ: Cyan -> Tím -> Hồng Magenta
      MỚI: Cyan -> Xanh dương sáng -> Xanh dương đậm
   */
-  background: linear-gradient(90deg, #00d4ff 0%, #00a2ff 50%, #0077ff 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  text-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
+  /* background: linear-gradient(90deg, #00d4ff 0%, #00a2ff 50%, #0077ff 100%); */
+  /* -webkit-background-clip: text; */
+  /* background-clip: text; */
+  /* color: transparent; */
+  /* text-shadow: 0 5px 15px rgba(0, 212, 255, 0.3); */
   margin-bottom: 20px;
   position: relative;
   letter-spacing: 2px;
+  color: aliceblue;
 }
 
 .glitch {
   position: relative;
   /* animation: glitch-skew 4s infinite linear alternate-reverse; */
   animation: none;
-  text-shadow: 2px 2px 0px #00d4ff;
+  /* text-shadow: 2px 2px 0px #00d4ff; */
 }
 
 .glitch::before,
@@ -289,7 +291,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  /* background: rgba(0, 10, 30, 0.95); */
+  background: rgba(0, 10, 30, 1);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -639,7 +641,7 @@
   overflow: hidden;
   border: 2px solid rgba(0, 212, 255, 0.2);
   box-shadow: 0 0 15px rgba(0, 212, 255, 0.1);
-  background: #000;
+  /* background: #000; */
 }
 
 .gallery-item:hover .img-wrapper {
@@ -724,14 +726,8 @@
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  /* Copy màu nền từ .upload-screen sang đây */
-  background: linear-gradient(
-    135deg,
-    #050a1f 0%,
-    #0a1535 30%,
-    #12255b 70%,
-    #1a3a7a 100%
-  );
+  background: url("/bg_main.jpg") no-repeat center center;
+  background-size: cover;
   z-index: 0;
 }
 
@@ -739,7 +735,7 @@
 
 .game-logo {
   position: absolute;
-  top: 10px; /* Cách mép trên */
+  top: 30px; /* Cách mép trên */
   left: 50%;
   transform: translateX(-50%); /* Căn giữa tuyệt đối */
   width: 350px; /* Tùy chỉnh độ to nhỏ của logo tại đây */
@@ -756,5 +752,229 @@
   .game-logo {
     width: 180px;
     top: 20px;
+  }
+}
+
+/* effects.css - PHIÊN BẢN SKINVERSE (MÀU MỚI) - TỐI ƯU HIỆU NĂNG */
+
+.game-button-grid {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 20px 0;
+}
+
+@media (orientation: portrait) {
+  .game-button-grid {
+    flex-direction: column;
+  }
+}
+
+.kiosk-btn {
+  width: 100%;
+  aspect-ratio: 3.5/2;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  padding: 20px;
+
+  /* Tối ưu hiệu năng: Không dùng blur */
+  background-color: rgba(10, 20, 40, 0.6); /* Nền tối bán trong suốt chung */
+
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.kiosk-btn:active {
+  transform: scale(0.96);
+}
+
+.kiosk-btn:hover {
+  transform: translateY(-5px);
+}
+
+/* --- MÀU SẮC BUTTON MỚI --- */
+
+/* Nút GAME 01: Xanh Cyan & Xanh Biển Sâu */
+.btn-cyan {
+  /* Gradient chuyển từ Cyan sáng sang Xanh đậm */
+  background-image: linear-gradient(
+    135deg,
+    rgba(0, 242, 255, 0.15) 0%,
+    rgba(0, 119, 255, 0.1) 100%
+  );
+  border-color: #00f2ff; /* Viền Cyan sáng */
+
+  /* Shadow màu Cyan */
+  box-shadow: 0 0 20px rgba(0, 242, 255, 0.2),
+    inset 0 0 20px rgba(0, 242, 255, 0.1);
+}
+
+/* Nút GAME 02: Tím Lavender & Xanh Chàm (Thay cho màu hồng) */
+.btn-pink {
+  /* Gradient chuyển từ Tím sáng sang Xanh Chàm tối */
+  background-image: linear-gradient(
+    135deg,
+    rgba(180, 100, 255, 0.15) 0%,
+    rgba(80, 50, 200, 0.1) 100%
+  );
+  border-color: #b464ff; /* Viền Tím sáng */
+
+  /* Shadow màu Tím */
+  box-shadow: 0 0 20px rgba(180, 100, 255, 0.2),
+    inset 0 0 20px rgba(180, 100, 255, 0.1);
+}
+
+/* Hover: Tăng độ sáng nền nhẹ */
+.btn-cyan:hover {
+  background-color: rgba(0, 242, 255, 0.25);
+}
+.btn-pink:hover {
+  background-color: rgba(180, 100, 255, 0.25);
+}
+
+/* --- TEXT STYLES --- */
+.btn-icon {
+  font-size: 3.5rem;
+  margin-bottom: 15px;
+  text-shadow: 0 0 15px currentColor; /* Tăng glow cho icon */
+}
+.btn-cyan .btn-icon {
+  color: #00f2ff;
+} /* Icon màu Cyan */
+.btn-pink .btn-icon {
+  color: #b464ff;
+} /* Icon màu Tím */
+
+.btn-subtitle {
+  font-family: "Bai Jamjuree", sans-serif;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+
+.btn-title {
+  font-family: "Bai Jamjuree", sans-serif;
+  font-size: 1.8rem;
+  color: white;
+  margin: 5px 0 0 0;
+  line-height: 1.2;
+  font-weight: 800;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 600px) {
+  .btn-title {
+    font-size: 1.4rem;
+  }
+  .kiosk-btn {
+    min-height: 180px;
+  }
+}
+
+/* --- WIN SCREEN STYLES (Thêm vào cuối file effects.css) --- */
+
+.win-screen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 100; /* Đảm bảo nằm trên cùng */
+
+  /* NỀN: Kết hợp lớp phủ tối màu + Ảnh nền chính */
+  background: linear-gradient(rgba(5, 10, 31, 0.85), rgba(5, 10, 31, 0.95)),
+    url("/bg_main.jpg") no-repeat center center;
+  background-size: cover;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-family: "Bai Jamjuree", sans-serif;
+}
+
+.win-content-container {
+  text-align: center;
+  animation: fadeUp 0.8s ease-out;
+}
+
+.big-win-title {
+  font-size: 7rem; /* Cực to */
+  font-weight: 800;
+  color: #00d4ff;
+  text-shadow: 0 0 30px rgba(0, 212, 255, 0.6);
+  margin-bottom: 20px;
+  line-height: 1;
+}
+
+.win-subtitle {
+  font-size: 2rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.9);
+  margin-top: 70px;
+}
+
+/* Style đặc biệt cho chữ BAO LÌ XÌ */
+.special-prize-text {
+  display: inline-block;
+  font-size: 4rem; /* To hơn hẳn chữ thường */
+  font-weight: 900;
+  color: #f9d7f4; /* Màu hồng neon nổi bật (hoặc dùng #00d4ff nếu thích xanh) */
+  margin-top: 15px;
+
+  /* GẠCH CHÂN */
+  text-decoration: underline;
+  text-underline-offset: 10px; /* Khoảng cách gạch chân */
+  text-decoration-thickness: 3px; /* Độ dày nét gạch */
+
+  text-shadow: 0 0 20px currentColor; /* Phát sáng theo màu chữ */
+  animation: pulseText 1.5s infinite ease-in-out;
+}
+
+/* Hiệu ứng chữ đập nhẹ */
+@keyframes pulseText {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive cho màn nhỏ */
+@media (max-width: 768px) {
+  .big-win-title {
+    font-size: 5rem;
+  }
+  .special-prize-text {
+    font-size: 3rem;
   }
 }

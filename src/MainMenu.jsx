@@ -5,8 +5,9 @@ import "./styles/effects.css";
 export default function MainMenu({ onSelectGame, audioEnabled }) {
   const handleSelect = (mode) => {
     if (audioEnabled) {
+      // Âm thanh click nhẹ nhàng hơn
       const audio = new Audio("/sounds/click.mp3");
-      audio.volume = 0.3;
+      audio.volume = 0.5;
       audio.play().catch((e) => {});
     }
     onSelectGame(mode);
@@ -14,75 +15,48 @@ export default function MainMenu({ onSelectGame, audioEnabled }) {
 
   return (
     <div className="upload-screen">
-      <div className="cyber-grid"></div>
-      <div className="floating-particles"></div>
-
+      {/* Giữ lại khung chứa nội dung */}
       <div
         className="upload-content menu-content"
-        style={{ maxWidth: "600px" }}
+        style={{
+          maxWidth: "700px", // Mở rộng xíu để nút to hơn
+          background: "rgba(10, 20, 40, 0.6)", // Nền mờ hơn cho thoáng
+          border: "1px solid rgba(255,255,255,0.1)",
+        }}
       >
-        <div className="title-container">
+        <div className="title-container" style={{ marginBottom: "30px" }}>
           <h1 className="main-title glitch" data-text="EMMIÉ KIOSK">
-            EMMIÉ KIOSK
+            Vũ trụ trò chơi
           </h1>
-          <p className="subtitle">Chọn thử thách của bạn</p>
+          <p className="subtitle">Chọn thử thách để nhận quà</p>
         </div>
 
-        <div
-          className="game-selection-grid"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "30px",
-            marginTop: "40px",
-          }}
-        >
-          {/* Nút chọn Game 1 */}
+        {/* Grid chứa 2 nút vuông */}
+        <div className="game-button-grid">
+          {/* NÚT 1: GAME PUZZLE (Màu Xanh Cyan sáng) */}
           <div
-            className="gallery-item"
+            className="kiosk-btn btn-cyan"
             onClick={() => handleSelect("puzzle")}
-            style={{ width: "100%" }}
           >
-            <div
-              className="img-wrapper"
-              style={{ aspectRatio: "3/1", border: "2px solid #00d4ff" }}
-            >
-              {/* Thay ảnh bìa game 1 ở đây */}
-              <img src="/images/cover_game1.jpg" alt="Puzzle Game" />
-              <div className="overlay">
-                <span className="start-btn">DEVICE VERSE</span>
-              </div>
-            </div>
-            <div className="item-label">GAME 01: GHÉP HÌNH SÁNG TẠO</div>
+            <h3 className="btn-subtitle">GAME 01</h3>
+            <h2 className="btn-title">
+              HÀNH TINH
+              <br />
+              THIẾT BỊ LÀM ĐẸP
+            </h2>
           </div>
 
-          {/* Nút chọn Game 2 */}
+          {/* NÚT 2: GAME SEQUENCE (Màu Hồng Tím sáng) */}
           <div
-            className="gallery-item"
+            className="kiosk-btn btn-pink"
             onClick={() => handleSelect("sequence")}
-            style={{ width: "100%" }}
           >
-            <div
-              className="img-wrapper"
-              style={{ aspectRatio: "3/1", border: "2px solid #ff00d4" }}
-            >
-              {/* Thay ảnh bìa game 2 ở đây */}
-              <img src="/images/cover_game2.jpg" alt="Sequence Game" />
-              <div className="overlay">
-                <span
-                  className="start-btn"
-                  style={{
-                    borderColor: "#ff00d4",
-                    boxShadow: "0 0 15px #ff00d4",
-                  }}
-                >
-                  SKIN VERSE
-                </span>
-              </div>
-            </div>
-            <div className="item-label" style={{ color: "#ff99eb" }}>
-              GAME 02: QUY TRÌNH CHUẨN
-            </div>
+            <h3 className="btn-subtitle">GAME 02</h3>
+            <h2 className="btn-title">
+              XẾP ROUTINE
+              <br />
+              CHUẨN GLOW
+            </h2>
           </div>
         </div>
       </div>

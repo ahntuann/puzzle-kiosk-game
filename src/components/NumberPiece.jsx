@@ -1,5 +1,5 @@
-import React, { useRef, useEffect } from "react";
-import { Group, Image as KonvaImage } from "react-konva";
+import React, { useRef, useState } from "react";
+import { Group, Image as KonvaImage, Rect } from "react-konva";
 import useImage from "use-image";
 import Konva from "konva";
 
@@ -8,19 +8,8 @@ const NumberPiece = React.memo(
     const [image] = useImage(data.img);
     const groupRef = useRef(null);
 
-    // Cache giữ nguyên như tối ưu trước
-    useEffect(() => {
-      if (image && groupRef.current) {
-        const node = groupRef.current;
-        node.cache({
-          pixelRatio: 1,
-          x: -10,
-          y: -10,
-          width: size + 20,
-          height: size + 20,
-        });
-      }
-    }, [image, size]);
+    // State nội bộ để xử lý hiệu ứng, tránh render lại cả Game cha
+    const [isDragging, setIsDragging] = useState(false);
 
     return (
       <Group
@@ -29,45 +18,44 @@ const NumberPiece = React.memo(
         x={data.currentX}
         y={data.currentY}
         draggable={!data.isLocked}
+        // Chống rung tay: Kéo quá 3px mới tính là drag
         dragDistance={3}
+        // Tối ưu quan trọng:
         perfectDrawEnabled={false}
-        // QUAN TRỌNG: Scale lấy từ props data (do cha quản lý)
-        // Nếu đang Locked (đúng ô) thì to 1.2, còn ở spawn thì 1
-        scaleX={data.isLocked ? 1.2 : 1}
-        scaleY={data.isLocked ? 1.2 : 1}
+        scaleX={isDragging ? 1.2 : data.isLocked ? 1.2 : 1}
+        scaleY={isDragging ? 1.2 : data.isLocked ? 1.2 : 1}
         onDragStart={(e) => {
-          // e.target.clearCache(); // Nếu cần mượt hơn khi scale
+          setIsDragging(true);
           e.target.moveToTop();
-          e.target.to({
-            scaleX: 1.2, // Kéo lên thì to ra
-            scaleY: 1.2,
-            shadowOffsetX: 10,
-            shadowOffsetY: 10,
-            shadowBlur: 0,
-            shadowOpacity: 0.3,
-            duration: 0.1,
-            easing: Konva.Easings.EaseOut,
-          });
           onDragStart(e);
         }}
         onDragEnd={(e) => {
-          // SỬA TẠI ĐÂY: Chỉ tắt bóng, KHÔNG THU NHỎ (để cha quyết định)
-          e.target.to({
-            shadowOffsetX: 0,
-            shadowOffsetY: 0,
-            shadowBlur: 0,
-            shadowOpacity: 0,
-            duration: 0.2,
-          });
+          setIsDragging(false);
           onDragEnd(e, data.id);
         }}
       >
+        {/* 1. HÌNH ẢNH (Chỉ để nhìn, không bắt sự kiện - listening=false) */}
         <KonvaImage
           image={image}
           width={size}
           height={size}
-          shadowBlur={0}
-          listening={true}
+          listening={false} // Tối ưu: CPU bỏ qua ảnh này
+          // Chỉ đổ bóng khi đang kéo -> Tiết kiệm tài nguyên lúc đứng im
+          shadowColor="black"
+          shadowBlur={0} // Luôn tắt blur để mượt
+          shadowOffsetX={isDragging ? 10 : 0}
+          shadowOffsetY={isDragging ? 10 : 0}
+          shadowOpacity={isDragging ? 0.3 : 0}
+        />
+
+        {/* 2. TẤM KHIÊN TRONG SUỐT (Để bắt sự kiện kéo) 
+          Đây là cách fix lỗi "không kéo được" hiệu quả nhất.
+      */}
+        <Rect
+          width={size}
+          height={size}
+          fill="transparent" // Trong suốt
+          listening={true} // Bắt sự kiện chuột ở đây
         />
       </Group>
     );

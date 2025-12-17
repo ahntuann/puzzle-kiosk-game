@@ -5,8 +5,9 @@ import {
   Rect,
   Group,
   Circle,
+  Text, // Nhớ import Text để vẽ chữ
   Image as KonvaImage,
-} from "react-konva"; // Thêm Image import
+} from "react-konva";
 import useImage from "use-image";
 import useSound from "use-sound";
 import Konva from "konva";
@@ -22,8 +23,18 @@ import {
   BOARD_MAX_HEIGHT,
 } from "./utils";
 import PuzzleBoard from "./components/PuzzleBoard";
-import EmmieFrame from "./components/EmmieFrame";
-// import ModernStars from "./components/ModernStars"; // Tắt sao bay để tối ưu
+import WinScreen from "./components/WinScreen";
+
+// --- DANH SÁCH TÊN SẢN PHẨM (Sửa text ở đây) ---
+const PRODUCT_NAMES = {
+  // Điền đúng đường dẫn ảnh bạn dùng
+  "/images/1.png": "Máy Triệt Lông IPL Sapphire ICE Unlimited",
+  "/images/2.png": "Máy Rửa Mặt Đa Năng  5-in-1 Mini UPGRADE",
+  "/images/3.png": "Máy Triệt Lông IPL Pro ICE Infinite Glide",
+  "/images/4.png": "Máy Rửa Mặt Premium Đạt Chứng Nhận FDA",
+  "/images/5.png": "Máy Triệt Lông IPL MAX POWER",
+  "/images/6.png": "Máy Rửa Mặt Đa Năng Glowmaster 7-in-1 ",
+};
 
 const TRAY_CONFIG = {
   y: 1400,
@@ -155,9 +166,6 @@ export default function JigsawGame({ userImage, onReset }) {
     const piece = pieces.find((p) => p.id === id);
     if (!piece) return;
 
-    // Logic tính toán khoảng cách vẫn giữ nguyên
-    // Lưu ý: Do e.target.x() bị ảnh hưởng bởi padding trong PuzzlePiece,
-    // nhưng logic này vẫn đúng nếu bạn không thay đổi offset trong PuzzlePiece
     const x = e.target.x() + layout.padding;
     const y = e.target.y() + layout.padding;
     const dist = Math.hypot(x - piece.correctX, y - piece.correctY);
@@ -202,7 +210,6 @@ export default function JigsawGame({ userImage, onReset }) {
         easing: Konva.Easings.StrongEaseOut,
       });
 
-      // Reset về vị trí spawn nếu thả sai
       setPieces((old) =>
         old.map((p) =>
           p.id === id
@@ -222,12 +229,6 @@ export default function JigsawGame({ userImage, onReset }) {
 
   return (
     <div className="game-scene">
-      {/* CSS Effects: Đã tắt bớt trong effects.css */}
-      <div className="cyber-grid"></div>
-
-      {/* TẮT PARTICLE NẾU LAG */}
-      {/* <div className="floating-particles"></div> */}
-
       <img src="/images/logo1.png" alt="Brand Logo" className="game-logo" />
 
       <Stage
@@ -235,40 +236,62 @@ export default function JigsawGame({ userImage, onReset }) {
         height={window.innerHeight}
         scaleX={window.innerWidth / KIOSK_WIDTH}
         scaleY={window.innerHeight / KIOSK_HEIGHT}
-        pixelRatio={1} // QUAN TRỌNG: Giữ tỷ lệ 1:1 cho nhẹ
+        pixelRatio={1}
         listening={true}
       >
-        {/* --- LAYER 1: TĨNH (STATIC LAYER) ---
-            Chứa tất cả những thứ KHÔNG BAO GIỜ DI CHUYỂN.
-            listening={false} giúp Konva bỏ qua kiểm tra va chạm chuột ở đây -> Siêu nhẹ.
-        */}
         <Layer listening={false}>
-          {/* 1. NỀN ĐẶC (BLOCKER) */}
+          {/* 1. NỀN ĐẶC (Giữ nguyên như bạn muốn) */}
           <Rect
             x={layout.boardX - 20}
             y={layout.boardY - 20}
             width={layout.boardW + 40}
             height={layout.boardH + 40}
-            fill="#050a1f"
+            fill="#050a1f" // Màu nền tối
             cornerRadius={20}
-            shadowColor="#00d4ff"
-            shadowBlur={0} // Tắt blur đi cho nhẹ, hoặc để nhỏ
-            shadowOpacity={0.3}
-            stroke="#00d4ff"
+            stroke="#00d4ff" // Viền xanh
             strokeWidth={1}
+            opacity={0.8}
+            shadowColor="#00d4ff"
+            shadowBlur={15}
+            shadowOpacity={0.3}
           />
 
-          {/* 2. ẢNH HINT MỜ (Được tách ra từ PuzzleBoard để nằm ở layer tĩnh) */}
+          {/* 2. ẢNH HINT MỜ */}
           <KonvaImage
             image={imageObj}
             x={layout.boardX}
             y={layout.boardY}
             width={layout.boardW}
             height={layout.boardH}
-            opacity={0.15} // Mờ đi để gợi ý
+            opacity={0.2}
           />
 
-          {/* 3. KHAY CHỨA */}
+          {/* 3. TÊN SẢN PHẨM */}
+          <Group x={0} y={layout.boardY + layout.boardH + 60}>
+            <Text
+              text={PRODUCT_NAMES[userImage] || ""}
+              width={KIOSK_WIDTH}
+              align="center"
+              fontFamily="Bai Jamjuree"
+              // Giảm size đi 1 xíu cho tinh tế hơn, to quá trông hơi thô
+              fontSize={34}
+              // Dùng font weight nặng nhất để chữ dày dặn
+              fontStyle="900"
+              // --- HIỆU ỨNG NEON HIỆN ĐẠI ---
+              fill="white" // Ruột chữ trắng tinh
+              // Tạo viền sáng mỏng để định hình chữ
+              stroke="#00d4ff" // Viền màu xanh cyan neon
+              strokeWidth={1} // Viền mỏng thôi
+              // Hiệu ứng phát sáng lan tỏa (Glow)
+              shadowColor="#00d4ff" // Màu phát sáng cũng là xanh cyan
+              shadowBlur={30} // Độ lan tỏa rộng ra như ánh sáng
+              shadowOpacity={1} // Độ sáng tối đa
+              shadowOffsetX={0} // Ánh sáng tỏa đều từ trung tâm
+              shadowOffsetY={0}
+            />
+          </Group>
+
+          {/* 4. KHAY CHỨA (Giữ nguyên) */}
           <Group>
             <Rect
               x={40}
@@ -279,8 +302,8 @@ export default function JigsawGame({ userImage, onReset }) {
               cornerRadius={40}
               stroke="rgba(0, 212, 255, 0.3)"
               strokeWidth={2}
+              opacity={0.6}
             />
-            {/* Vẽ các slot nét đứt */}
             {Array.from({ length: 6 }).map((_, i) => {
               const r = Math.floor(i / TRAY_CONFIG.cols);
               const c = i % TRAY_CONFIG.cols;
@@ -302,7 +325,6 @@ export default function JigsawGame({ userImage, onReset }) {
                     stroke="rgba(255,255,255,0.1)"
                     dash={[5, 5]}
                   />
-                  {/* Dấu cộng */}
                   <Rect
                     x={-10}
                     y={-1}
@@ -321,14 +343,8 @@ export default function JigsawGame({ userImage, onReset }) {
               );
             })}
           </Group>
-
-          {/* 4. KHUNG TRANG TRÍ */}
-          <EmmieFrame width={KIOSK_WIDTH} height={KIOSK_HEIGHT} />
         </Layer>
 
-        {/* --- LAYER 2: ĐỘNG (DYNAMIC LAYER) ---
-            Chỉ chứa các mảnh ghép. Khi kéo thả, chỉ layer này được vẽ lại.
-        */}
         <Layer>
           <PuzzleBoard
             img={userImage}
@@ -346,7 +362,6 @@ export default function JigsawGame({ userImage, onReset }) {
         </Layer>
       </Stage>
 
-      {/* --- NÚT BACK --- */}
       <button
         onClick={() => {
           stopBgm();
@@ -360,35 +375,13 @@ export default function JigsawGame({ userImage, onReset }) {
       </button>
 
       {isWin && (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: "rgba(0,10,30,0.95)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "white",
-            fontFamily: "Orbitron",
-            zIndex: 20,
+        <WinScreen
+          onReset={() => {
+            stopBgm();
+            stopWin();
+            onReset();
           }}
-        >
-          <h1 style={{ fontSize: "6rem", textShadow: "0 0 20px #00d4ff" }}>
-            HOÀN THÀNH!
-          </h1>
-          <button
-            onClick={() => {
-              stopBgm();
-              stopWin();
-              onReset();
-            }}
-            className="btn-upload"
-            style={{ marginTop: 60, transform: "scale(1.5)" }}
-          >
-            CHƠI LẠI
-          </button>
-        </div>
+        />
       )}
     </div>
   );

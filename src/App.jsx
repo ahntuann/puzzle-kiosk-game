@@ -6,7 +6,6 @@ import SequenceGame from "./SequenceGame";
 import "./styles/effects.css";
 
 export default function App() {
-  // state: 'menu' | 'puzzle' | 'sequence'
   const [currentMode, setCurrentMode] = useState("menu");
   const [audioEnabled, setAudioEnabled] = useState(false);
 
@@ -31,6 +30,8 @@ export default function App() {
 
   return (
     <>
+      <img src="/images/logo1.png" alt="Logo" className="game-logo" />
+
       {currentMode === "menu" && (
         <MainMenu
           onSelectGame={(mode) => setCurrentMode(mode)}

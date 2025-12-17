@@ -39,12 +39,12 @@ export default function PuzzleFlow({ onBack, audioEnabled }) {
           >
             ⬅ MENU
           </button>
-          <div className="cyber-grid"></div>
+          {/* <div className="cyber-grid"></div> */}
 
           <div className="upload-content menu-content">
             <div className="title-container">
               <h1 className="main-title glitch" data-text="CHỌN MẪU GHÉP">
-                CHỌN MẪU GHÉP
+                Chọn hành tinh "máy"<div></div>bạn muốn khám phá
               </h1>
             </div>
             <div className="gallery-grid">
