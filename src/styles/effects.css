@@ -858,7 +858,7 @@
 
 .btn-subtitle {
   font-family: "Bai Jamjuree", sans-serif;
-  font-size: 1rem;
+  font-size: 1.5rem;
   color: rgba(255, 255, 255, 0.7);
   margin: 0;
   text-transform: uppercase;
@@ -868,7 +868,7 @@
 
 .btn-title {
   font-family: "Bai Jamjuree", sans-serif;
-  font-size: 1.8rem;
+  font-size: 2.5rem;
   color: white;
   margin: 5px 0 0 0;
   line-height: 1.2;
@@ -897,7 +897,7 @@
   z-index: 100; /* Đảm bảo nằm trên cùng */
 
   /* NỀN: Kết hợp lớp phủ tối màu + Ảnh nền chính */
-  background: linear-gradient(rgba(5, 10, 31, 0.85), rgba(5, 10, 31, 0.95)),
+  background: linear-gradient(rgba(5, 10, 31, 0.65), rgba(5, 10, 31, 0.75)),
     url("/bg_main.jpg") no-repeat center center;
   background-size: cover;
 
@@ -917,7 +917,7 @@
 .big-win-title {
   font-size: 7rem; /* Cực to */
   font-weight: 800;
-  color: #00d4ff;
+  /* color: #00d4ff; */
   text-shadow: 0 0 30px rgba(0, 212, 255, 0.6);
   margin-bottom: 20px;
   line-height: 1;
@@ -976,5 +976,97 @@
   }
   .special-prize-text {
     font-size: 3rem;
+  }
+}
+
+/* --- RIÊNG CHO MAIN MENU --- */
+.main-menu-bg {
+  /* Thay đổi đường dẫn ảnh nền riêng cho Menu tại đây */
+  background: url("/public/images/menu_background.jpg") no-repeat center center;
+
+  /* Hoặc nếu muốn dùng màu Gradient khác biệt hẳn: */
+  /* background: linear-gradient(135deg, #1a0b2e 0%, #4a148c 100%); */
+
+  background-size: cover;
+
+  /* Đảm bảo nó đè lên các background cũ */
+  background-attachment: fixed;
+}
+
+.game-logo-main-menu {
+  width: 500px; /* Giảm kích thước logo cho Menu */
+  top: 20px; /* Cách mép trên */
+  left: 50%;
+  transform: translateX(-50%); /* Căn giữa tuyệt đối */
+  z-index: 15; /* Nổi lên trên canvas nhưng dưới màn hình Win */
+}
+
+/* --- BOTTOM DECORATIONS FOR MAIN MENU --- */
+
+/* Ảnh sóng trừu tượng */
+.bottom-decoration-wave {
+  position: absolute;
+  bottom: -200px;
+  left: 0;
+  width: 100%; /* Tràn chiều ngang màn hình */
+  height: auto;
+  z-index: 1; /* Lớp thấp nhất trong các element nổi */
+  pointer-events: none; /* Để không chặn click chuột vào các phần tử khác */
+  opacity: 0.9; /* Tùy chỉnh độ đậm nhạt nếu cần */
+}
+
+/* Ảnh chữ The New Skinverse */
+.bottom-skinverse-text {
+  position: absolute;
+  bottom: 40px; /* Cách đáy một khoảng, điều chỉnh số này cho vừa mắt */
+  left: 50%;
+  transform: translateX(-50%); /* Kỹ thuật căn giữa absolute */
+  width: 50%; /* Chiều rộng tương đối so với màn hình, điều chỉnh nếu quá to/nhỏ */
+  max-width: 600px; /* Giới hạn chiều rộng tối đa trên màn hình lớn */
+  height: auto;
+  z-index: 2; /* Nằm trên ảnh sóng (z-index 1) */
+  pointer-events: none;
+}
+
+/* Điều chỉnh responsive cho màn hình Kiosk dọc (nếu cần) */
+@media (aspect-ratio: 9/16) {
+  .bottom-skinverse-text {
+    width: 70%; /* Trên màn dọc thì cho chữ to ra xíu */
+    left: 70%;
+    bottom: 50px;
+  }
+  /* .bottom-decoration-wave {
+    object-fit: cover;
+    object-position: top center;
+  } */
+}
+
+.prize-image {
+  /* height: 350px;
+  width: auto; */
+
+  /* margin-top: 20px; */
+
+  animation: pulseImage 1.5s infinite ease-in-out;
+}
+
+/* Định nghĩa chuyển động nhấp nhô */
+@keyframes pulseImage {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08); /* Phóng to lên 8% ở giữa nhịp */
+  }
+}
+
+/* Responsive cho màn hình nhỏ hơn (nếu cần test trên laptop) */
+@media (max-height: 800px) {
+  .prize-image {
+    height: 200px;
+  }
+  .big-win-title {
+    font-size: 5rem;
   }
 }

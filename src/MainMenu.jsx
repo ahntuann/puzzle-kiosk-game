@@ -5,7 +5,6 @@ import "./styles/effects.css";
 export default function MainMenu({ onSelectGame, audioEnabled }) {
   const handleSelect = (mode) => {
     if (audioEnabled) {
-      // Âm thanh click nhẹ nhàng hơn
       const audio = new Audio("/sounds/click.mp3");
       audio.volume = 0.5;
       audio.play().catch((e) => {});
@@ -14,14 +13,22 @@ export default function MainMenu({ onSelectGame, audioEnabled }) {
   };
 
   return (
-    <div className="upload-screen">
-      {/* Giữ lại khung chứa nội dung */}
+    // Đảm bảo container cha có position relative hoặc fixed để làm mốc
+    <div
+      className="upload-screen main-menu-bg"
+      style={{ position: "relative", overflow: "hidden" }}
+    >
+      {/* Khung chứa nội dung chính (Buttons, Title) */}
       <div
         className="upload-content menu-content"
         style={{
-          maxWidth: "700px", // Mở rộng xíu để nút to hơn
-          background: "rgba(10, 20, 40, 0.6)", // Nền mờ hơn cho thoáng
+          maxWidth: "700px",
+          background: "rgba(10, 20, 40, 0.6)",
           border: "1px solid rgba(255,255,255,0.1)",
+          // Thêm z-index để đảm bảo nội dung luôn nổi trên ảnh trang trí nếu có đè nhau
+          position: "relative",
+          zIndex: 10,
+          // marginBottom: "150px", // Đẩy nội dung lên trên một chút để nhường chỗ cho ảnh đáy
         }}
       >
         <div className="title-container" style={{ marginBottom: "30px" }}>
@@ -31,9 +38,8 @@ export default function MainMenu({ onSelectGame, audioEnabled }) {
           <p className="subtitle">Chọn thử thách để nhận quà</p>
         </div>
 
-        {/* Grid chứa 2 nút vuông */}
         <div className="game-button-grid">
-          {/* NÚT 1: GAME PUZZLE (Màu Xanh Cyan sáng) */}
+          {/* NÚT 1 */}
           <div
             className="kiosk-btn btn-cyan"
             onClick={() => handleSelect("puzzle")}
@@ -46,7 +52,7 @@ export default function MainMenu({ onSelectGame, audioEnabled }) {
             </h2>
           </div>
 
-          {/* NÚT 2: GAME SEQUENCE (Màu Hồng Tím sáng) */}
+          {/* NÚT 2 */}
           <div
             className="kiosk-btn btn-pink"
             onClick={() => handleSelect("sequence")}
@@ -60,6 +66,22 @@ export default function MainMenu({ onSelectGame, audioEnabled }) {
           </div>
         </div>
       </div>
+
+      {/* --- PHẦN ẢNH TRANG TRÍ DƯỚI ĐÁY (MỚI THÊM) --- */}
+
+      {/* 1. Ảnh sóng trừu tượng (Nằm lớp dưới) */}
+      <img
+        src="/images/decoration_wave.png" // <-- HÃY ĐỔI LẠI ĐÚNG ĐƯỜNG DẪN FILE CỦA BẠN
+        alt=""
+        className="bottom-decoration-wave"
+      />
+
+      {/* 2. Ảnh chữ Skinverse (Nằm lớp trên) */}
+      <img
+        src="/images/skinverse_text.png" // <-- HÃY ĐỔI LẠI ĐÚNG ĐƯỜNG DẪN FILE CỦA BẠN
+        alt="The New Skinverse"
+        className="bottom-skinverse-text"
+      />
     </div>
   );
 }
