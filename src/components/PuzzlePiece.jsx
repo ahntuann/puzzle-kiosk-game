@@ -12,6 +12,7 @@ const PuzzlePiece = React.memo(
     const [image] = useImage(img);
     const groupRef = useRef(null);
 
+    // 1. TÍNH TOÁN PATH (HÌNH DÁNG MẢNH GHÉP)
     const pathData = useMemo(() => {
       return getPiecePath(
         width,
@@ -24,27 +25,25 @@ const PuzzlePiece = React.memo(
       );
     }, [width, height, piece, padding]);
 
+    // 2. TÍNH TOÁN TỈ LỆ ẢNH FILL
     const sourceItemWidth = image ? image.width / GRID_COLS : 0;
     const sourceItemHeight = image ? image.height / GRID_ROWS : 0;
     const scaleX = sourceItemWidth ? width / sourceItemWidth : 1;
     const scaleY = sourceItemHeight ? height / sourceItemHeight : 1;
 
-    // --- HÀM CACHE TỰ ĐỘNG (SỬA LỖI CẮT HÌNH) ---
+    // 3. HÀM CACHE (SNAPSHOT THÀNH ẢNH BITMAP ĐỂ NHẸ MÁY)
     const cachePiece = () => {
       const node = groupRef.current;
       if (!node) return;
 
-      // Bước 1: Xóa cache cũ nếu có
+      // Xóa cache cũ trước khi tạo mới
       node.clearCache();
 
       try {
-        // Bước 2: Tự động lấy kích thước bao quanh của tất cả các hình vẽ bên trong
-        // (Bao gồm cả Path, Shadow, Stroke...)
-        // skipTransform: true để lấy kích thước gốc chưa bị scale
+        // Lấy kích thước thực tế của mảnh ghép (bao gồm cả phần lồi lõm)
         const rect = node.getClientRect({ skipTransform: true });
 
-        // Bước 3: Cache dựa trên kích thước thật đó + mở rộng thêm vùng an toàn (buffer)
-        // Mở rộng thêm 20px mỗi chiều để chắc chắn bóng đổ không bị cắt
+        // Vùng đệm an toàn để không bị cắt mất bóng đổ
         const buffer = 20;
 
         node.cache({
@@ -52,7 +51,9 @@ const PuzzlePiece = React.memo(
           y: rect.y - buffer,
           width: rect.width + buffer * 2,
           height: rect.height + buffer * 2,
-          // Giữ pixelRatio=1 để nhẹ máy, nhưng vẫn đủ nét
+          offset: buffer,
+          // QUAN TRỌNG: Để 1 cho nhẹ máy Kiosk.
+          // Nếu máy khỏe hơn có thể tăng lên 1.2 cho nét, nhưng máy yếu thì 1 là an toàn nhất.
           pixelRatio: 1,
         });
       } catch (e) {
@@ -60,13 +61,12 @@ const PuzzlePiece = React.memo(
       }
     };
 
+    // 4. KÍCH HOẠT CACHE KHI ẢNH LOAD XONG HOẶC RESIZE
     useEffect(() => {
       if (image) {
-        // Gọi hàm cache khi ảnh đã load xong hoặc kích thước thay đổi
-        // Dùng setTimeout để đảm bảo render xong mới chụp hình
         const timer = setTimeout(() => {
           cachePiece();
-        }, 0);
+        }, 100); // Delay nhẹ để đảm bảo render xong mới chụp
         return () => clearTimeout(timer);
       }
     }, [image, width, height, padding, piece.isLocked]);
@@ -82,17 +82,22 @@ const PuzzlePiece = React.memo(
         draggable={!piece.isLocked}
         scaleX={piece.currentScale || 1}
         scaleY={piece.currentScale || 1}
+        // Tối ưu hiệu năng: Tắt vẽ chính xác tuyệt đối
         perfectDrawEnabled={false}
+        // Chống rung tay: Kéo quá 3px mới tính là di chuyển
+        dragDistance={3}
+        // --- SỰ KIỆN KÉO THẢ TỐI ƯU ---
         onDragStart={(e) => {
           if (piece.isLocked) return;
           e.target.moveToTop();
 
-          // Khi kéo: Xóa cache để hiện Vector gốc (nét nhất, mượt nhất)
-          e.target.clearCache();
+          // TỐI ƯU QUAN TRỌNG: KHÔNG clearCache() ở đây nữa.
+          // Giữ nguyên Cache (Bitmap) để di chuyển mượt mà.
 
+          // Hiệu ứng nhấc lên: Phóng to nhẹ (1.05)
           e.target.to({
-            scaleX: 1,
-            scaleY: 1,
+            scaleX: 1.05,
+            scaleY: 1.05,
             duration: 0.1,
             easing: Konva.Easings.EaseOut,
           });
@@ -102,17 +107,20 @@ const PuzzlePiece = React.memo(
         onDragEnd={(e) => {
           if (piece.isLocked) return;
 
-          // Khi thả tay: Để yên Vector, useEffect sẽ tự động chạy lại cachePiece
-          // sau khi component cha cập nhật props
+          // Hiệu ứng thả xuống: Trở về bình thường
+          e.target.to({
+            scaleX: 1,
+            scaleY: 1,
+            duration: 0.1,
+            easing: Konva.Easings.EaseOut,
+          });
 
           onDragEnd(e, piece.id);
         }}
-        // dragDistance={3}
-        // TỐI ƯU 2: Vùng chạm giả (Hit Region)
+        // --- VÙNG CHẠM TỐI ƯU CHO CẢM ỨNG ---
         hitFunc={(context, shape) => {
           context.beginPath();
-          // Vẽ một hình chữ nhật đơn giản bao quanh mảnh ghép để bắt sự kiện
-          // Cộng thêm padding để dễ bấm trúng hơn trên màn cảm ứng
+          // Vẽ vùng chạm hình chữ nhật bao quanh (dễ bấm trúng hơn hình ghép phức tạp)
           context.rect(
             -padding,
             -padding,
@@ -120,21 +128,20 @@ const PuzzlePiece = React.memo(
             height + padding * 2
           );
           context.closePath();
-          // Quan trọng: Hàm này giúp Konva biết đây là vùng tương tác
           context.fillStrokeShape(shape);
         }}
       >
-        {/* 1. BÓNG ĐỔ */}
+        {/* LỚP 1: BÓNG ĐỔ (Dùng Path đen thay vì ShadowBlur để nhẹ máy) */}
         <Path
           data={pathData}
           fill="#000"
           offsetX={-4}
           offsetY={-4}
-          opacity={0.3}
-          listening={false}
+          opacity={0.2} // Bóng mờ nhẹ
+          listening={false} // Không bắt sự kiện chuột
         />
 
-        {/* 2. ĐỘ DÀY (Giả 3D) */}
+        {/* LỚP 2: ĐỘ DÀY GIẢ 3D */}
         <Path
           data={pathData}
           fill="#2c3e50"
@@ -143,7 +150,7 @@ const PuzzlePiece = React.memo(
           listening={false}
         />
 
-        {/* 3. ẢNH CHÍNH */}
+        {/* LỚP 3: ẢNH MẢNH GHÉP */}
         <Path
           data={pathData}
           fillPatternImage={image}

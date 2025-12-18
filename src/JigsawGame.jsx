@@ -252,7 +252,7 @@ export default function JigsawGame({ userImage, onReset }) {
             strokeWidth={1}
             opacity={0.8}
             shadowColor="#00d4ff"
-            shadowBlur={15}
+            shadowBlur={0}
             shadowOpacity={0.3}
           />
 
@@ -266,27 +266,55 @@ export default function JigsawGame({ userImage, onReset }) {
             opacity={0.2}
           />
 
-          {/* 3. TÊN SẢN PHẨM */}
-          <Group x={0} y={layout.boardY + layout.boardH + 60}>
+          {/* 3. TÊN SẢN PHẨM - PHONG CÁCH CLEAN CYBERPUNK */}
+          <Group
+            x={0}
+            // Tăng khoảng cách Y lên một chút để thoáng hơn (60 -> 80)
+            y={layout.boardY + layout.boardH + 10}
+          >
+            {/* --- LỚP NỀN TỐI BÁN TRONG SUỐT (TECH PLATE) ---
+      Giúp chữ luôn nổi bật bất kể background phía sau */}
+            <Rect
+              x={KIOSK_WIDTH * 0.05} // Căn giữa: lùi vào 5% mỗi bên
+              width={KIOSK_WIDTH * 0.9} // Chiều rộng 90% màn hình
+              height={100} // Chiều cao cố định cho khung tên
+              fill="rgba(4, 12, 36, 0.85)" // Màu xanh đen đậm, bán trong suốt
+              cornerRadius={16} // Bo góc hiện đại
+              // Thêm viền sáng nhẹ cho khung nền
+              stroke="rgba(0, 212, 255, 0.3)"
+              strokeWidth={1}
+              shadowColor="black"
+              shadowBlur={0}
+              shadowOpacity={0.5}
+            />
+
+            {/* --- TEXT SẢN PHẨM --- */}
             <Text
               text={PRODUCT_NAMES[userImage] || ""}
-              width={KIOSK_WIDTH}
+              x={KIOSK_WIDTH * 0.05} // Bắt đầu cùng vị trí với khung nền
+              y={0}
+              width={KIOSK_WIDTH * 0.9} // Chiều rộng bằng khung nền
+              height={100} // Chiều cao bằng khung nền để căn giữa dọc
               align="center"
+              verticalAlign="middle" // Căn giữa theo chiều dọc
               fontFamily="Bai Jamjuree"
-              // Giảm size đi 1 xíu cho tinh tế hơn, to quá trông hơi thô
-              fontSize={34}
-              // Dùng font weight nặng nhất để chữ dày dặn
-              fontStyle="900"
-              // --- HIỆU ỨNG NEON HIỆN ĐẠI ---
-              fill="white" // Ruột chữ trắng tinh
-              // Tạo viền sáng mỏng để định hình chữ
-              stroke="#00d4ff" // Viền màu xanh cyan neon
-              strokeWidth={1} // Viền mỏng thôi
-              // Hiệu ứng phát sáng lan tỏa (Glow)
-              shadowColor="#00d4ff" // Màu phát sáng cũng là xanh cyan
-              shadowBlur={30} // Độ lan tỏa rộng ra như ánh sáng
-              shadowOpacity={1} // Độ sáng tối đa
-              shadowOffsetX={0} // Ánh sáng tỏa đều từ trung tâm
+              // Giảm xuống 32 để vừa vặn khung hơn
+              fontSize={32}
+              // Giảm weight xuống 800 (ExtraBold) thay vì 900 để nét chữ rõ hơn
+              fontStyle="800"
+              wrap="word" // Tự động xuống dòng nếu tên quá dài
+              padding={10} // Khoảng cách đệm bên trong
+              // --- HIỆU ỨNG NEON SẮC NÉT (CLEAN NEON) ---
+              fill="white" // Ruột trắng
+              // Tăng viền xanh lên để định hình chữ rõ hơn
+              stroke="#00d4ff"
+              strokeWidth={1.5}
+              // QUAN TRỌNG: Giảm shadowBlur và tăng Opacity
+              // Tạo cảm giác ánh sáng mạnh nhưng gọn gàng, không bị nhòe nhoẹt
+              shadowColor="#00d4ff"
+              shadowBlur={0} // Giảm từ 30 xuống 12 -> Sắc nét hơn
+              shadowOpacity={1}
+              shadowOffsetX={0}
               shadowOffsetY={0}
             />
           </Group>

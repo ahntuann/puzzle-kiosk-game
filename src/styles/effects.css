@@ -1032,7 +1032,7 @@
 @media (aspect-ratio: 9/16) {
   .bottom-skinverse-text {
     width: 70%; /* Trên màn dọc thì cho chữ to ra xíu */
-    left: 70%;
+    /* left: 70%; */
     bottom: 50px;
   }
   /* .bottom-decoration-wave {

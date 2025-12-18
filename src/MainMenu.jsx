@@ -70,11 +70,11 @@ export default function MainMenu({ onSelectGame, audioEnabled }) {
       {/* --- PHẦN ẢNH TRANG TRÍ DƯỚI ĐÁY (MỚI THÊM) --- */}
 
       {/* 1. Ảnh sóng trừu tượng (Nằm lớp dưới) */}
-      <img
+      {/* <img
         src="/images/decoration_wave.png" // <-- HÃY ĐỔI LẠI ĐÚNG ĐƯỜNG DẪN FILE CỦA BẠN
         alt=""
         className="bottom-decoration-wave"
-      />
+      /> */}
 
       {/* 2. Ảnh chữ Skinverse (Nằm lớp trên) */}
       <img

@@ -55,7 +55,7 @@ const StarShape = ({ x, y, size, duration, delay }) => {
       }}
       fill="#fff"
       shadowColor="#fff"
-      shadowBlur={15}
+      shadowBlur={0}
     />
   );
 };
