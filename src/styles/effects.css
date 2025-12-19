@@ -588,6 +588,23 @@
   }
 }
 
+@media (max-width: 768px) {
+  .upload-content {
+    padding: 20px;
+    margin: 20px;
+  }
+  .main-title {
+    font-size: 2.5rem;
+  }
+  .specs {
+    flex-direction: column;
+    align-items: center;
+  }
+  .spec-item {
+    min-width: 200px;
+  }
+}
+
 /* ========================================= */
 /* ===== NEW: GALLERY MENU STYLES (GIỮ NGUYÊN) ===== */
 /* ========================================= */

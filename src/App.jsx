@@ -70,14 +70,6 @@ export default function App() {
 
   return (
     <>
-      <img
-        src="/images/logo1.png"
-        alt="Logo"
-        className={`game-logo ${
-          currentMode === "menu" ? "game-logo-main-menu" : ""
-        }`}
-      />
-
       {/* --- NÚT CHUYỂN CHẾ ĐỘ FULLSCREEN (Luôn nổi trên cùng) --- */}
       <button
         onClick={toggleFullscreen}
