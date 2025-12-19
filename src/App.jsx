@@ -84,7 +84,7 @@ export default function App() {
         style={{
           position: "fixed",
           top: "20px",
-          right: "20px", // Góc trên bên phải
+          right: "20px", // Góc trên bên phả
           zIndex: 9999, // Luôn nằm trên cùng
           background: "rgba(0, 0, 0, 0.5)", // Bán trong suốt
           border: "1px solid rgba(255, 255, 255, 0.3)",
